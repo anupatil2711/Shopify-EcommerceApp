@@ -1,5 +1,6 @@
 {
   "expo": {
+    "plugins": ["@react-native-firebase/app", "@react-native-firebase/auth"],
     "name": "EcommerceApp",
     "slug": "EcommerceApp",
     "version": "1.0.0",
@@ -15,9 +16,11 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anushka2711.EcommerceApp"
     },
     "android": {
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"

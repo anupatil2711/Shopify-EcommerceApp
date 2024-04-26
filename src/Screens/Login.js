@@ -3,26 +3,26 @@ import React, { useState } from 'react'
 import CustomTextInput from '../common/CustomTextInput'
 import CommonButton from '../common/CommonButton'
 import { useNavigation } from '@react-navigation/native'
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import firestore from '@react-native-firebase/firestore';
 import Loader from '../common/Loader'
-import COLORS from '../constants/Color'
 
-export default function Login() {
+export default function Login({route}) {
   const navigation = useNavigation();
-  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
-  const [badEmail, setBadEmail] = useState(false);
+  const [badPhone, setBadPhone] = useState(false);
   const [badPassword, setBadPassword] = useState(false);
   const [modalVisible, setModalVisible] =useState(false);
 
+  
   const login = () => {
     setModalVisible(true);
-    if(email==''){
+    if(phone==''){
       setModalVisible(false);
-      setBadEmail(true);
+      setBadPhone(true);
     }
     else{
-      setBadEmail(false);
+      setBadPhone(false);
       if(password==''){
         setModalVisible(false);
         setBadPassword(true);
@@ -36,42 +36,28 @@ export default function Login() {
     }
   };
   const getData = async () => {
-    const mEmail = await AsyncStorage.getItem('EMAIL');
-    const mPass = await AsyncStorage.getItem('PASSWORD');
-    if(email === mEmail && password === mPass){
-      setModalVisible(false);
-      navigation.navigate('Home');
-    }
-    else{
-      setModalVisible(false);
-      alert('Wrong Password');
+    try {
+      const userDoc = await firestore().collection('users').doc(phone).get();
+      const userData = userDoc.data();
+      if (userData && userData.password === password) {
+        setModalVisible(false)
+        navigation.navigate('Home', { phone });
+      } else {
+        setModalVisible(false)
+        setError('Invalid credentials');
+      }
+    } catch (error) {
+      console.error("Error logging in");
     }
   }
 
   return (
     <View className="flex-1">
       <Image source={require('../Images/playstore.png')} style={{ width: 90, height: 90, alignSelf: 'center', marginTop: 100 }}></Image>
-     <Text style={{
-        fontSize: 22,
-        fontWeight: 'bold',
-        marginVertical: 12,
-          color: COLORS.black,
-          marginLeft: 40,
-          marginTop:60
-        }}>
-        Hi Welcome Back ! 👋
-     </Text>
 
-     <Text style={{
-        fontSize: 16,
-        color: COLORS.black,
-        marginLeft: 40,
-        }}>Hello again you have been missed!</Text>
-
-      <CustomTextInput placeholder={'Enter Email id'} value={email} onChangeText={txt => {
-          setEmail(txt);
-       }} icon={require('../Images/email.png')}/>
-      {badEmail === true && (
+      <Text style={{ marginTop: 50, alignSelf: 'center', fontSize: 30, fontWeight: 600, color: '#000' }}>Login</Text>
+      <CustomTextInput placeholder={'Enter Phone Number'} value={phone} onChangeText={ setPhone} icon={require('../Images/phone-book.png')}/>
+      {badPhone === true && (
           <Text style={{marginTop: 10, marginLeft: 30, color: 'red'}}>
           Please Enter Email Id</Text>
       )}
@@ -83,14 +69,14 @@ export default function Login() {
           Please Valid Password</Text>
       )}
       <CommonButton title={'Login'} bgColor={'#000'} textColor={'#fff'} onPress={() => {
-        login();
+        login(phone, password);
       }} />
       <Text style={{fontSize:18, fontWeight:'700', textDecorationLine:'underline', alignSelf:'center', marginTop: 20}} onPress={() => {
           navigation.navigate('SignUp');
       }}>Create New Account?</Text>
       <Text style={{fontSize:18, fontWeight:'700', textDecorationLine:'underline', alignSelf:'center', marginTop: 20}} onPress={() => {
           navigation.navigate('PhoneSetup');
-      }}>Sign in with otp..</Text>
+      }}>Sign in using otp</Text>
       <Loader modalVisible={modalVisible} setModalVisible={setModalVisible} />
     </View>
   )

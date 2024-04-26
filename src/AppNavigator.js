@@ -9,6 +9,9 @@ import Checkout  from './Screens/Checkout';
 import Product from './Screens/Product';
 import Welcome from './Screens/Welcome';
 import PhoneSetup from './Screens/PhoneSetup';
+import Details from './Screens/Details';
+import Fetch from './Screens/Fetch';
+import CollectionData from './Screens/CollectionData'
 
 const Stack = createStackNavigator();
 export default function AppNavigator() {
@@ -29,6 +32,20 @@ export default function AppNavigator() {
                 headerShown: false
               }}
             />
+            <Stack.Screen
+              name="Details"
+              component={Details}
+              options={{
+                headerShown: false
+              }}
+            />
+            <Stack.Screen
+              name="Fetch"
+              component={Fetch}
+              options={{
+                headerShown: false
+              }}
+            />
             <Stack.Screen 
               options= {{headerShown: false}} 
               name="Login" 
@@ -43,6 +60,13 @@ export default function AppNavigator() {
               options= {{headerShown: false}} 
               name="Home" 
               component={Home} 
+            />
+            <Stack.Screen
+              name="CollectionData"
+              component={CollectionData}
+              options={{
+                headerShown: false
+              }}
             />
             <Stack.Screen 
               options= {{headerShown: false}} 

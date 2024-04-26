@@ -5,10 +5,11 @@ import CommonButton from '../common/CommonButton'
 import { useNavigation } from '@react-navigation/native'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import COLORS from '../constants/Color'
+import firestore from '@react-native-firebase/firestore';
 
 const isValid = true;
-const SignUp = () => {
-  const navigation = useNavigation();
+const SignUp = ({route, navigation}) => {
+  const { uid } = route.params;
   const [name, setName] = useState('');
   const [badName, setBadName] = useState(false);
   const [email, setEmail] = useState('');
@@ -17,8 +18,8 @@ const SignUp = () => {
   const [badPassword, setBadPassword] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState('');
   const [badConfirmPassword, setBadConfirmPassword] = useState(false);
-  const [mobile, setMobile] = useState('');
-  const [badMobile, setBadMobile] = useState(false);
+  const [phone, setPhone] = useState('');
+  const [badPhone, setBadPhone] = useState(false);
   const [buttonDisabled, setButtonDisabled] = useState(false);
 
   const signup = () => {
@@ -35,16 +36,16 @@ const SignUp = () => {
       }
       else {
         setBadEmail(false);
-        if (mobile == '') {
-          setBadMobile(true);
+        if (phone == '') {
+          setBadPhone(true);
           setButtonDisabled(false);
         }
-        else if (mobile.length < 10) {
-          setBadMobile(true);
+        else if (phone.length < 10) {
+          setBadPhone(true);
           setButtonDisabled(false);
         }
         else {
-          setBadMobile(false);
+          setBadPhone(false);
           if (password == '') {
             setBadPassword(true);
             setButtonDisabled(false);
@@ -73,11 +74,18 @@ const SignUp = () => {
   };
 
   const saveData = async () => {
-      await AsyncStorage.setItem('NAME', name);
-      await AsyncStorage.setItem('EMAIL', email);
-      await AsyncStorage.setItem('MOBILE', mobile);
-      await AsyncStorage.setItem('PASSWORD', password);
-      navigation.goBack();
+    try {
+      await firestore().collection('users').doc(phone).set({
+        name,
+        email,
+        password,
+        phone,
+      });
+      navigation.navigate('Login');
+    } catch (error) {
+      setError('Error signing up');
+      console.error(error);
+    }
   };
 
   return (
@@ -125,14 +133,12 @@ const SignUp = () => {
         )}
 
         <CustomTextInput
-          value={mobile}
-          onChangeText={txt => {
-            setMobile(txt);
-          }}
+          value={phone}
+          onChangeText={setPhone}
           keyboardType={'number-pad'}
           placeholder={'Enter Mobile'}
           icon={require('../Images/phone.png')} />
-        {badMobile === true && (
+        {badPhone === true && (
           <Text style={{ marginTop: 10, marginLeft: 30, color: 'red' }}>
             Please Enter Number</Text>
         )}
