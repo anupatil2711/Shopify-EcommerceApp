@@ -2,7 +2,7 @@
 
 # dependencies
 node_modules/
-/shopify.js
+shopify.js
 
 # Expo
 .expo/
